@@ -74,7 +74,8 @@ def test(test_dataloader, model, epoch, args, writer):
 
             # ------ TO DO: Make Predictions ------
             with torch.no_grad():     
-                pred_labels = None
+                pred_labels = model.forward(point_clouds)
+                pred_labels = torch.argmax(pred_labels, dim=2)
 
             correct_point += pred_labels.eq(labels.data).cpu().sum().item()
             num_point += labels.view([-1,1]).size()[0]
@@ -101,7 +102,7 @@ def main(args):
     if args.task == "cls":
         model = cls_model().to(args.device)
     else:
-        model = seg_model().to(args.device)
+        model = seg_model(num_seg_classes=args.num_seg_class).to(args.device)
 
     # Load Checkpoint
     if args.load_checkpoint:
