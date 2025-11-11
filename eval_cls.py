@@ -5,7 +5,7 @@ import torch
 from models import cls_model
 from utils import create_dir
 from tqdm import tqdm
-from utils import viz_pointcloud
+from utils import viz_pointcloud, rotate_pointcloud
 def create_parser():
     """Creates a parser for command-line arguments.
     """
@@ -53,8 +53,10 @@ if __name__ == '__main__':
 
     pred_label = torch.zeros_like(test_label)
     # ------ TO DO: Make Prediction ------
+    rotate_degs = [0, 0, 0]
     for idx in tqdm(range(test_data.shape[0])):
-        pred_label[idx] = torch.argmax(model.forward(test_data[idx:idx+1].to(args.device)), dim=1)
+        test_rotated = rotate_pointcloud(test_data[idx:idx+1], rotate_degs)
+        pred_label[idx] = torch.argmax(model.forward(test_rotated.to(args.device)), dim=1)
 
 
     # Compute Accuracy
@@ -62,4 +64,6 @@ if __name__ == '__main__':
     print ("test accuracy: {}".format(test_accuracy))
 
     # Visualize
-    viz_pointcloud(test_data[args.i], "{}/pointcloud_{}.gif".format(args.output_dir, args.exp_name), args.device)
+    test_rotated = rotate_pointcloud(test_data[args.i], rotate_degs)
+    viz_pointcloud(test_rotated, "{}/pointcloud_{}.gif".format(args.output_dir, args.exp_name), args.device)
+    print("Predicted class for point cloud: {}, Actual class: {}".format(pred_label[args.i], test_label.data[args.i]))

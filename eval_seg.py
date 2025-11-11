@@ -4,7 +4,7 @@ import argparse
 import torch
 from models import seg_model
 from data_loader import get_data_loader
-from utils import create_dir, viz_seg
+from utils import create_dir, viz_seg, rotate_pointcloud
 from tqdm import tqdm
 
 
@@ -55,14 +55,20 @@ if __name__ == '__main__':
 
 
     pred_label = torch.zeros_like(test_label)
-    # ------ TO DO: Make Prediction ------
+    # ------ TO DO: Make Prediction ------        
+    rotate_degs = [90, 0, 0]
+
     for idx in tqdm(range(test_data.shape[0])):
-        pred_label[idx] = torch.argmax(model.forward(test_data[idx:idx+1].to(args.device)), dim=2)
+        test_rotated = rotate_pointcloud(test_data[idx:idx+1], rotate_degs)
+        
+        pred_label[idx] = torch.argmax(model.forward(test_rotated.to(args.device)), dim=2)
 
 
     test_accuracy = pred_label.eq(test_label.data).cpu().sum().item() / (test_label.reshape((-1,1)).size()[0])
     print ("test accuracy: {}".format(test_accuracy))
 
     # Visualize Segmentation Result (Pred VS Ground Truth)
-    viz_seg(test_data[args.i], test_label[args.i], "{}/gt_{}.gif".format(args.output_dir, args.exp_name), args.device)
-    viz_seg(test_data[args.i], pred_label[args.i], "{}/pred_{}.gif".format(args.output_dir, args.exp_name), args.device)
+    test_rotated = rotate_pointcloud(test_data[args.i], rotate_degs)
+    
+    viz_seg(test_rotated, test_label[args.i], "{}/gt_{}.gif".format(args.output_dir, args.exp_name), args.device)
+    viz_seg(test_rotated, pred_label[args.i], "{}/pred_{}.gif".format(args.output_dir, args.exp_name), args.device)

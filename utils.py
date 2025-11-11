@@ -9,6 +9,7 @@ from pytorch3d.renderer import (
 )
 import imageio
 import numpy as np
+from scipy.spatial.transform import Rotation as R
 
 def save_checkpoint(epoch, model, args, best=False):
     if best:
@@ -121,3 +122,10 @@ def viz_pointcloud(verts, path, device):
 
     imageio.mimsave(path, rend, fps=15)
 
+def rotate_pointcloud(verts, rotation_degs_xyz):
+    rotation_mat = torch.tensor(R.from_euler("XYZ", rotation_degs_xyz, degrees=True).as_matrix()).to(verts.device).float()
+    rotated = torch.matmul(verts, rotation_mat.transpose(-1, -2))
+
+    return rotated
+
+# rotate_pointcloud([], [90, 90, 180])
