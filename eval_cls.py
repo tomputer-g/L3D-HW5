@@ -5,7 +5,7 @@ import torch
 from models import cls_model
 from utils import create_dir
 from tqdm import tqdm
-
+from utils import viz_pointcloud
 def create_parser():
     """Creates a parser for command-line arguments.
     """
@@ -61,3 +61,5 @@ if __name__ == '__main__':
     test_accuracy = pred_label.eq(test_label.data).cpu().sum().item() / (test_label.size()[0])
     print ("test accuracy: {}".format(test_accuracy))
 
+    # Visualize
+    viz_pointcloud(test_data[args.i], "{}/pointcloud_{}.gif".format(args.output_dir, args.exp_name), args.device)
