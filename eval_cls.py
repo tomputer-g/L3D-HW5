@@ -4,6 +4,7 @@ import argparse
 import torch
 from models import cls_model
 from utils import create_dir
+from tqdm import tqdm
 
 def create_parser():
     """Creates a parser for command-line arguments.
@@ -50,8 +51,11 @@ if __name__ == '__main__':
     test_data = torch.from_numpy((np.load(args.test_data))[:,ind,:])
     test_label = torch.from_numpy(np.load(args.test_label))
 
+    pred_label = torch.zeros_like(test_label)
     # ------ TO DO: Make Prediction ------
-    pred_label = torch.argmax(model.forward(test_data.to(args.device)), dim=1)
+    for idx in tqdm(range(test_data.shape[0])):
+        pred_label[idx] = torch.argmax(model.forward(test_data[idx:idx+1].to(args.device)), dim=1)
+
 
     # Compute Accuracy
     test_accuracy = pred_label.eq(test_label.data).cpu().sum().item() / (test_label.size()[0])

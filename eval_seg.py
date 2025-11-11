@@ -5,6 +5,7 @@ import torch
 from models import seg_model
 from data_loader import get_data_loader
 from utils import create_dir, viz_seg
+from tqdm import tqdm
 
 
 def create_parser():
@@ -36,7 +37,7 @@ if __name__ == '__main__':
     create_dir(args.output_dir)
 
     # ------ TO DO: Initialize Model for Segmentation Task  ------
-    model = seg_model(num_seg_classes=args.num_seg_class)
+    model = seg_model(num_seg_classes=args.num_seg_class).to(args.device)
     
     # Load Model Checkpoint
     model_path = './checkpoints/seg/{}.pt'.format(args.load_checkpoint)
@@ -52,9 +53,12 @@ if __name__ == '__main__':
     test_data = torch.from_numpy((np.load(args.test_data))[:,ind,:])
     test_label = torch.from_numpy((np.load(args.test_label))[:,ind])
 
+
+    pred_label = torch.zeros_like(test_label)
     # ------ TO DO: Make Prediction ------
-    pred_label = model.forward(test_data)
-    pred_label = torch.argmax(pred_label, dim=2)
+    for idx in tqdm(range(test_data.shape[0])):
+        pred_label[idx] = torch.argmax(model.forward(test_data[idx:idx+1].to(args.device)), dim=2)
+
 
     test_accuracy = pred_label.eq(test_label.data).cpu().sum().item() / (test_label.reshape((-1,1)).size()[0])
     print ("test accuracy: {}".format(test_accuracy))
