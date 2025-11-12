@@ -8,9 +8,35 @@ The test accuracy was fairly high at 0.9811.
 
 Correct predictions:
 
+Chair: 
+
+<image src="cls/pointcloud_0.gif">
+
+Vase:
+
+<image src="cls/pointcloud_700.gif">
+
+Lamp:
+
+<image src="cls/pointcloud_800.gif">
+
 Incorrect predictions:
 
+Ground truth: Chair, predicted: Lamp
+
+<image src="cls/pointcloud_77_wrong.gif">
+
+Ground truth: Vase, predicted: Lamp
+
+<image src="cls/pointcloud_650_wrong.gif">
+
+Ground truth: Lamp, predicted: Vase
+
+<image src="cls/pointcloud_883_wrong.gif">
+
 Interpretations:
+
+Overall, the network distinguishes between the majority of the chair, vase, and lamp objects very well given the accuracy score. The incorrect classifications are likely due to the ambiguous design made in the objects that, lacking further context, is hard to decisively classify as one of the three classes. For example, the chair failure case could be a square-ish design lamp; the vase might look like a lamp on a wooden square stand; and the lamp instance is abstract and lacking features and could be a large vase with a wide body.
 
 # Q2
 
@@ -20,11 +46,34 @@ The test accuracy is 0.8028.
 
 - Visualize segmentation results of at least 5 objects (including 2 bad predictions) with corresponding ground truth, report the prediction accuracy for each object, and provide interpretation in a few sentences.
 
-Correct predictions:
+Correct predictions (predicted point cloud | ground truth point cloud):
+
+Accuracy: 0.9711
+
+<image src="seg/pred_34.gif"><image src="seg/gt_34.gif">
+
+Accuracy: 0.9638
+
+<image src="seg/pred_185.gif"><image src="seg/gt_185.gif">
+
+Accuracy: 0.9416
+
+<image src="seg/pred_616.gif"><image src="seg/gt_616.gif">
 
 Incorrect predictions:
 
+Accuracy: 0.3804
+
+<image src="seg/pred_142_bad.gif"><image src="seg/gt_142_bad.gif">
+
+Accuracy: 0.2490
+
+<image src="seg/pred_577_bad.gif"><image src="seg/gt_577_bad.gif">
+
+
 Interpretations:
+
+While scoring lower accuracy than the classification network, overall the segmentation network performs well on more 'standard' chairs that are upright, four legged, and has an obvious seatback that stands up straight from the seat. However, we can see from the failure cases that it performs poorly on the rarer instances, such as a reclined chair, or a blocky chair with different dimensions than most of the other chairs in the training set.
 
 # Q3
 
