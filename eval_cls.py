@@ -63,6 +63,10 @@ if __name__ == '__main__':
     test_accuracy = pred_label.eq(test_label.data).cpu().sum().item() / (test_label.size()[0])
     print ("test accuracy: {}".format(test_accuracy))
 
+    # Print indices where prediction is wrong
+    wrong_indices = (pred_label != test_label.data).nonzero(as_tuple=True)[0]
+    print("Indices with wrong predictions:", wrong_indices.tolist())
+
     # Visualize
     test_rotated = rotate_pointcloud(test_data[args.i], rotate_degs)
     viz_pointcloud(test_rotated, "{}/pointcloud_{}.gif".format(args.output_dir, args.exp_name), args.device)

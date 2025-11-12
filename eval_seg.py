@@ -53,10 +53,9 @@ if __name__ == '__main__':
     test_data = torch.from_numpy((np.load(args.test_data))[:,ind,:])
     test_label = torch.from_numpy((np.load(args.test_label))[:,ind])
 
-
     pred_label = torch.zeros_like(test_label)
     # ------ TO DO: Make Prediction ------        
-    rotate_degs = [90, 0, 0]
+    rotate_degs = [0, 0, 0]
 
     for idx in tqdm(range(test_data.shape[0])):
         test_rotated = rotate_pointcloud(test_data[idx:idx+1], rotate_degs)
@@ -66,6 +65,15 @@ if __name__ == '__main__':
 
     test_accuracy = pred_label.eq(test_label.data).cpu().sum().item() / (test_label.reshape((-1,1)).size()[0])
     print ("test accuracy: {}".format(test_accuracy))
+
+    # Find indices where prediction has less than 30% correct points
+    correct_points = pred_label.eq(test_label.data).cpu().sum(dim=1)
+    total_points = test_label.size(1)
+    accuracy_per_object = correct_points / total_points
+    low_accuracy_indices = (accuracy_per_object < 0.4).nonzero(as_tuple=True)[0]
+    high_accuracy_indices = (accuracy_per_object >= 0.96).nonzero(as_tuple=True)[0]
+    print("Low accuracy indices:", low_accuracy_indices.tolist())
+    print("High accuracy indices:", high_accuracy_indices.tolist())
 
     # Visualize Segmentation Result (Pred VS Ground Truth)
     test_rotated = rotate_pointcloud(test_data[args.i], rotate_degs)
